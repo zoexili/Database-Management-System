@@ -8,19 +8,26 @@ using namespace db;
 
 // TODO pa1.4: implement
 HeapPageId::HeapPageId(int tableId, int pgNo) {
+    TableId = tableId;
+    PgNo = pgNo;
 }
 
 int HeapPageId::getTableId() const {
     // TODO pa1.4: implement
+    return TableId;
 }
 
 int HeapPageId::pageNumber() const {
     // TODO pa1.4: implement
+    return PgNo;
 }
 
 bool HeapPageId::operator==(const PageId &other) const {
     if (const auto *otherPageId = dynamic_cast<const HeapPageId *>(&other)) {
         // TODO pa1.4: implement
+        if (TableId == otherPageId->getTableId() && PgNo == otherPageId->pageNumber()) {
+            return true;
+        }
     }
     return false;
 }

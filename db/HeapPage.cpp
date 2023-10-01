@@ -46,14 +46,22 @@ HeapPage::HeapPage(const HeapPageId &id, uint8_t *data) : pid(id) {
 
 int HeapPage::getNumTuples() {
     // TODO pa1.4: implement
+    BufferPool &bp = Database::getBufferPool();
+    // this gives the floor value already. 
+    int numTuples = (bp.getPageSize() * 8) / (td.getSize() + 1);
+    return numTuples;
 }
 
 int HeapPage::getHeaderSize() {
     // TODO pa1.4: implement
+    BufferPool &bp = Database::getBufferPool();
+    int headerSize = bp.getPageSize() - getNumTuples() * td.getSize();
+    return headerSize;
 }
 
 PageId &HeapPage::getId() {
     // TODO pa1.4: implement
+    return pid;
 }
 
 void HeapPage::readTuple(Tuple *t, uint8_t *data, int slotId) {
@@ -102,16 +110,31 @@ uint8_t *HeapPage::createEmptyPageData() {
 
 int HeapPage::getNumEmptySlots() const {
     // TODO pa1.4: implement
+    int emptySlots = 0;
+    for (int i = 0; i < numSlots; i++) {
+        if (!isSlotUsed(i)) {
+            emptySlots += 1;
+        }
+    }
+    return emptySlots;
 }
 
 bool HeapPage::isSlotUsed(int i) const {
     // TODO pa1.4: implement
+    int byteLocation = i / 8;
+    int posByteLoc = i % 8;
+    // create a bitmask to isolate the byteLoc
+    int tmp = 1 << posByteLoc;
+    // perform AND bitwise operation, only if the byteLoc is set, return nonzero. 
+    return (header[byteLocation] & tmp) != 0;
 }
 
 HeapPageIterator HeapPage::begin() const {
     // TODO pa1.4: implement
+     return HeapPageIterator(0, this);
 }
 
 HeapPageIterator HeapPage::end() const {
     // TODO pa1.4: implement
+    return HeapPageIterator(numSlots, this);
 }

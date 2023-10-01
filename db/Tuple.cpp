@@ -56,7 +56,6 @@ Tuple::iterator Tuple::end() const {
 std::string Tuple::to_string() const {
     // TODO pa1.1: implement
     std::string str;
-    // str += tpField[0].to_string();
     for (auto it = tpField.begin(); it != tpField.end(); it++) {
         str += (*it)->to_string();
         if (std::next(it) != tpField.end()) {
