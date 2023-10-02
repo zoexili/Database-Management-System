@@ -23,10 +23,6 @@ Page *BufferPool::getPage(const TransactionId &tid, PageId *pid) {
     return &pool[*pid];
 }
 
-int BufferPool::getPageSize() const { 
-    return pageSize; 
-}
-
 void BufferPool::evictPage() {
     // do nothing for now
 }

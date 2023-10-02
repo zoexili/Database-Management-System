@@ -2,6 +2,11 @@
 
 using namespace db;
 
+HeapPageIterator::HeapPageIterator() {
+    slot = 0;
+    page = nullptr;
+}
+
 HeapPageIterator::HeapPageIterator(int i, const HeapPage *page) {
     this->slot = i;
     this->page = page;

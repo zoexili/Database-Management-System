@@ -9,10 +9,17 @@
 #include <db/HeapPage.h>
 
 namespace db {
+    class HeapFile;
+    
     class HeapFileIterator {
         // TODO pa1.5: add private members
+        TransactionId TID;
+        int pagePosition;
+        const HeapFile *file;
+        HeapPageIterator currPageIterator; // this causes error no default constuctor for heappageiterator so I added a default constructor
+
     public:
-        HeapFileIterator(/* TODO pa1.5: add parameters */);
+        HeapFileIterator(TransactionId TID, int pagePosition, const db::HeapFile *file);
         bool operator!=(const HeapFileIterator &other) const;
 
         Tuple &operator*() const;
@@ -32,6 +39,9 @@ namespace db {
      */
     class HeapFile : public DbFile {
         // TODO pa1.5: add private members
+        const char* filename;
+        TupleDesc TD; 
+        
     public:
 
         /**
@@ -62,7 +72,7 @@ namespace db {
         /**
          * Returns the number of pages in this HeapFile.
          */
-        int getNumPages();
+        int getNumPages() const;
 
         HeapFileIterator begin() const;
 

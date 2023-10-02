@@ -123,6 +123,7 @@ namespace db {
         int slot;
         const HeapPage *page;
     public:
+        HeapPageIterator();
         HeapPageIterator(int slot, const HeapPage *page);
 
         bool operator!=(const HeapPageIterator &other) const;
