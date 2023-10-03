@@ -1,3 +1,6 @@
+#ifndef DB_HEAPFILE_H
+#define DB_HEAPFILE_H
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -8,18 +11,20 @@
 #include <db/TransactionId.h>
 #include <db/HeapPage.h>
 
+
 namespace db {
     class HeapFile;
     
     class HeapFileIterator {
         // TODO pa1.5: add private members
-        TransactionId TID;
+        TransactionId *TID;
         int pagePosition;
         const HeapFile *file;
         HeapPageIterator currPageIterator; // this causes error no default constuctor for heappageiterator so I added a default constructor
 
     public:
-        HeapFileIterator(TransactionId TID, int pagePosition, const db::HeapFile *file);
+        HeapFileIterator();
+        HeapFileIterator(TransactionId *TID, int pagePosition, const db::HeapFile *file);
         bool operator!=(const HeapFileIterator &other) const;
 
         Tuple &operator*() const;
@@ -79,3 +84,5 @@ namespace db {
         HeapFileIterator end() const;
     };
 }
+
+#endif

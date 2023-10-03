@@ -9,12 +9,17 @@
 #include <db/TransactionId.h>
 #include <db/TupleDesc.h>
 #include <db/DbFile.h>
+#include <db/HeapFile.h>
 
 namespace db {
     class SeqScanIterator {
         // TODO pa1.6: add private members
+        TransactionId* TID;
+        int TABLE_ID;
+        HeapFileIterator currFileIterator;
+        bool IS_End;
     public:
-        SeqScanIterator(/* TODO pa1.6: add parameters */);
+        SeqScanIterator(TransactionId *tid, int tableid, bool isEnd);
 
         bool operator!=(const SeqScanIterator &other) const;
 
@@ -31,6 +36,9 @@ namespace db {
     class SeqScan {
         using iterator = SeqScanIterator;
         // TODO pa1.6: add private members
+        TransactionId* TID;
+        int TABLE_ID;
+        std::string TABLE_ALIAS;
     public:
 
         /**

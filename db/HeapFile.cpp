@@ -56,13 +56,13 @@ int HeapFile::getNumPages() const {
 
 HeapFileIterator HeapFile::begin() const {
     // TODO pa1.5: implement
-    TransactionId t;
+    TransactionId *t;
     return HeapFileIterator(t, 0, this);
 }
 
 HeapFileIterator HeapFile::end() const {
     // TODO pa1.5: implement
-    TransactionId t;
+    TransactionId *t;
     return HeapFileIterator(t, getNumPages(), this);
 }
 
@@ -70,8 +70,19 @@ HeapFileIterator HeapFile::end() const {
 // HeapFileIterator
 //
 
+HeapFileIterator::HeapFileIterator() {
+    pagePosition = 0;
+    file = nullptr;
+
+    if (pagePosition < file->getNumPages()) {
+        HeapPageId pageId(file->getId(), pagePosition); 
+        HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
+        currPageIterator = currPage->begin();
+    }
+}
+
 // TODO pa1.5: implement
-HeapFileIterator::HeapFileIterator(TransactionId tid, int pagePos, const HeapFile *hpFile) {
+HeapFileIterator::HeapFileIterator(TransactionId *tid, int pagePos, const HeapFile *hpFile) {
     // TODO pa1.5: implement
     TID = tid;
     pagePosition = pagePos;
@@ -79,7 +90,7 @@ HeapFileIterator::HeapFileIterator(TransactionId tid, int pagePos, const HeapFil
     
     if (pagePos < file->getNumPages()) {
         HeapPageId pageId(hpFile->getId(), pagePos); 
-        HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(TID, &pageId));
+        HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
         currPageIterator = currPage->begin();
     }
 }
@@ -100,14 +111,14 @@ Tuple &HeapFileIterator::operator*() const {
 HeapFileIterator &HeapFileIterator::operator++() {
     // TODO pa1.5: implement
     HeapPageId pageId(file->getId(), pagePosition); 
-    HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(TID, &pageId));
+    HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
     if(currPageIterator != currPage->end()) {
         ++currPageIterator;
     } else {
         ++pagePosition;
         if (pagePosition < file->getNumPages()) {
             HeapPageId pageId(file->getId(), pagePosition); 
-            HeapPage *currPage = dynamic_cast<HeapPage*>(Database::getBufferPool().getPage(TID, &pageId));
+            HeapPage *currPage = dynamic_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
             currPageIterator = currPage->begin();
         }
     }
