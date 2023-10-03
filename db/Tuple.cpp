@@ -10,12 +10,10 @@ using namespace db;
 // TODO pa1.1: implement
 // initialize your private member variables with the provided arguments
 Tuple::Tuple(const TupleDesc &td, RecordId *rid) {
-    assert(td.numFields() > 0);
-    tpDesc = td;
-    if (rid) {
-        rId = rid;
-    }
-    tpField.resize(td.numFields());
+    // assert(td.numFields() > 0);
+    // tpField.resize(td.numFields());
+    this->tpDesc = td;
+    this->rId = rid;
 }
 
 const TupleDesc &Tuple::getTupleDesc() const {
@@ -35,12 +33,16 @@ void Tuple::setRecordId(const RecordId *id) {
 
 const Field &Tuple::getField(int i) const {
     // TODO pa1.1: implement
-    return *tpField[i];
+    if (i >= 0 && i < tpField.size()) {
+        return *tpField[i];
+    } 
 }
 
 void Tuple::setField(int i, const Field *f) {
     // TODO pa1.1: implement
-    *tpField[i] = *f;
+    if (i >= 0 && i < tpField.size()) {
+        *tpField[i] = *f;
+    }
 }
 
 Tuple::iterator Tuple::begin() const {

@@ -10,7 +10,13 @@ using namespace db;
 
 bool TDItem::operator==(const TDItem &other) const {
     // TODO pa1.1: implement
-    return fieldType == other.fieldType && fieldName == other.fieldName;
+    if (this == &other) {
+        return true;
+    }
+    if (this->fieldType == other.fieldType) {
+        return true;
+    }
+    return false;
 }
 
 // calculate TDItem's hash value and return it
@@ -25,91 +31,79 @@ std::size_t std::hash<TDItem>::operator()(const TDItem &r) const {
 // TupleDesc
 //
 
+TupleDesc::TupleDesc(std::vector<TDItem> &TDItemVec){
+    this->TDItemVec=TDItemVec;
+    this->fieldTot=TDItemVec.size();
+}
+
 // TODO pa1.1: implement
 // initialize your private member variables with the provided arguments
 TupleDesc::TupleDesc(const std::vector<Types::Type> &types) {
-    TDTypes = types;
-    for (size_t i = 0; i < TDTypes.size(); i++) {
-        TDItemVec.emplace_back(TDTypes[i], "");
+    fieldTot = types.size();
+    for(int i = 0; i < fieldTot; i++) {
+        TDItemVec.emplace_back(types[i], "");
     }
+
 }
 
 // TODO pa1.1: implement
 TupleDesc::TupleDesc(const std::vector<Types::Type> &types, const std::vector<std::string> &names) {
-    if (types.size() != names.size()) {
-        throw std::invalid_argument("Types and Names must have the same size.");
-    }
-    TDTypes = types;
-    TDNames = names;
-    for (size_t i = 0; i < TDTypes.size(); i++) {
-        TDItemVec.emplace_back(TDTypes[i], TDNames[i]);
-    }
+    fieldTot = types.size();
+
+    for(int i=0; i<fieldTot; i++){
+       TDItemVec.emplace_back(types[i], names[i]);
+   }
 }
 
 size_t TupleDesc::numFields() const {
     // TODO pa1.1: implement
-    return TDTypes.size();
+    return this->fieldTot;
 }
 
 std::string TupleDesc::getFieldName(size_t i) const {
     // TODO pa1.1: implement
-    // if (i >= TDNames.size()) {
-    //     throw std::out_of_range("Index out of bound for TD Names.");
-    // }
-    // return TDNames[i];
-    return (i < TDNames.size()) ? TDNames[i] : throw std::out_of_range("Index out of bound for TDNames.");
+    return TDItemVec[i].fieldName;
 }
 
 Types::Type TupleDesc::getFieldType(size_t i) const {
     // TODO pa1.1: implement
-    // if (i >= TDTypes.size()) {
-    //     throw std::out_of_range("Index out of bound for TDTypes.");
-    // }
-    // return TDTypes[i];
-    return (i < TDTypes.size()) ? TDTypes[i] : throw std::out_of_range("Index out of bound for TDTypes.");
+    return TDItemVec[i].fieldType;
 }
 
 
 // Find the field index based on field name
 int TupleDesc::fieldNameToIndex(const std::string &fieldName) const {
     // TODO pa1.1: implement
-    auto it = std::find(TDNames.begin(), TDNames.end(), fieldName);
-
-    if (it != TDNames.end()) {
-        // Calculate the index
-        int index = std::distance(TDNames.begin(), it);
-        return index;
+    if(fieldName.empty()){
+        throw std::invalid_argument("");
     }
-    throw std::invalid_argument("Unknown Field Name");
+
+    for (int i = 0; i < TDItemVec.size(); i++)
+    {
+        if (TDItemVec[i].fieldName==fieldName)
+        {
+            return i;
+        }
+    }
+    throw std::invalid_argument("");
 }
 
 // A field has its type and its name, you need to sum up the bits of each field's type
 size_t TupleDesc::getSize() const {
     // TODO pa1.1: implement
-    int total_sum = 0;
-    if (TDTypes.size() > 0) {
-        for (auto &TDType : TDTypes) {
-            total_sum += Types::getLen(TDType);
-        }
+    unsigned long tot=0;
+    for (const TDItem& item : this->TDItemVec) {
+        tot += getLen(item.fieldType);
     }
-    return total_sum;
+    return tot;
 }
 
 TupleDesc TupleDesc::merge(const TupleDesc &td1, const TupleDesc &td2) {
     // TODO pa1.1: implement
-    TupleDesc merge_TD;
-    merge_TD.TDTypes.resize(td1.numFields() + td2.numFields());
-    merge_TD.TDNames.resize(td1.numFields() + td2.numFields());
-    int idx = 0;
-    for (int i = 0; i < td1.numFields(); i++) {
-        merge_TD.TDTypes[idx] = td1.TDTypes[i];
-        merge_TD.TDNames[idx++] = td1.TDNames[i];
-    }
-    for (int i = 0; i < td2.numFields(); i++) {
-        merge_TD.TDTypes[idx] = td2.TDTypes[i];
-        merge_TD.TDNames[idx++] = td2.TDNames[i];
-    }
-    return merge_TD;
+    std::vector<TDItem> mergedTD = td1.TDItemVec;
+    mergedTD.insert(mergedTD.end(), td2.TDItemVec.begin(), td2.TDItemVec.end());
+
+    return TupleDesc(mergedTD);
 }
 
 // return a string: "fieldType[0](fieldName[0]), ..., fieldType[M](fieldName[M])"
@@ -135,22 +129,21 @@ std::string TupleDesc::to_string() const {
 
 bool TupleDesc::operator==(const TupleDesc &other) const {
     // TODO pa1.1: implement
-    if (TDNames.size() != other.TDNames.size()) {
+    bool res = true;
+    if(this==&other){
+        return true;
+    }
+    if(this->numFields()!=other.numFields()){
         return false;
     }
-    if (TDTypes.size() != other.TDTypes.size()) {
-        return false;
-    }
-    for (int i = 0; i < TDTypes.size(); i++) {
-        // cannot check if a string is null in cpp
-        if (getFieldName(i) != (other.getFieldName(i))) {
-            return false;
-        }
-        else if (getFieldType(i) != (other.getFieldType(i))) {
+    for (int i = 0; i < numFields(); i++)
+    {
+        if(this->TDItemVec[i]!=other.TDItemVec[i])
+        {
             return false;
         }
     }
-    return true;
+   return true;
 }
 
 TupleDesc::iterator TupleDesc::begin() const {
