@@ -53,7 +53,7 @@ int HeapPage::getNumTuples() {
     // TODO pa1.4: implement
     BufferPool &bp = Database::getBufferPool();
     // this gives the floor value already. 
-    int numTuples = (bp.getPageSize() * 8) / (td.getSize() + 1);
+    int numTuples = (bp.getPageSize() * 8) / (td.getSize() * 8 + 1);
     return numTuples;
 }
 

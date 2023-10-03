@@ -11,7 +11,7 @@ using namespace db;
 // initialize your private member variables with the provided arguments
 Tuple::Tuple(const TupleDesc &td, RecordId *rid) {
     // assert(td.numFields() > 0);
-    // tpField.resize(td.numFields());
+    tpField.resize(td.numFields());
     this->tpDesc = td;
     this->rId = rid;
 }
@@ -41,7 +41,7 @@ const Field &Tuple::getField(int i) const {
 void Tuple::setField(int i, const Field *f) {
     // TODO pa1.1: implement
     if (i >= 0 && i < tpField.size()) {
-        *tpField[i] = *f;
+    tpField[i] = const_cast<Field*>(f);
     }
 }
 
