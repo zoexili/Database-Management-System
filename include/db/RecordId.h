@@ -13,7 +13,7 @@ namespace db {
      */
     class RecordId {
         // TODO pa1.4: add private members
-        PageId *Pid;
+        const PageId* Pid;
         int TupleNo;
     public:
         RecordId() = default;

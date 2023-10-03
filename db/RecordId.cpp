@@ -9,13 +9,13 @@ using namespace db;
 
 // TODO pa1.4: implement
 RecordId::RecordId(const PageId *pid, int tupleno) {
-    *Pid = *pid;
+    Pid = pid;
     TupleNo = tupleno;
 }
 
 bool RecordId::operator==(const RecordId &other) const {
     // TODO pa1.4: implement
-    if (Pid == other.getPageId() && TupleNo == other.getTupleno()) {
+    if (*Pid == *(other.getPageId()) && TupleNo == other.getTupleno()) {
         return true;
     }
     return false;

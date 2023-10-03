@@ -11,16 +11,16 @@ BufferPool::BufferPool(int numPages) {
 
 Page *BufferPool::getPage(const TransactionId &tid, PageId *pid) {
     // TODO pa1.3: implement
-    if (pool.count(*pid) > 0) {
-        return &pool[*pid];
+    if (pool.count(pid) > 0) {
+        return pool[pid];
     }
     else {
         Catalog &c = db::Database::getCatalog();
         DbFile* dbfile = c.getDatabaseFile(pid->getTableId());
         Page* page = dbfile->readPage(*pid);
-        pool[*pid] = *page;
+        pool[pid] = page;
     }
-    return &pool[*pid];
+    return pool[pid];
 }
 
 void BufferPool::evictPage() {
