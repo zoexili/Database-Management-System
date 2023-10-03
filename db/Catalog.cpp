@@ -8,19 +8,28 @@ void Catalog::addTable(DbFile *file, const std::string &name, const std::string 
     // TODO pa1.2: implement
     int tableID = file->getId();
 
-    for (auto &key: names) {
+    // Identify if there's an existing table with the same name but different ID, keep the 2nd one.
+    int idToRemove = -1;
+    for (const auto &key: names) {
         if (key.second == name) {
             if (key.first != tableID) {
-                names.erase(key.first);
-                dbFiles.erase(key.first);
-                pkeyFields.erase(key.first);
+                idToRemove = key.first;
+                break;
             }
-            break;
         }
     }
-    names.insert({tableID, name});
-    dbFiles.insert({tableID, file});
-    pkeyFields.insert({tableID, pkeyField});
+
+    // If there's a conflicting table, remove its entries
+    if (idToRemove != -1) {
+        names.erase(idToRemove);
+        dbFiles.erase(idToRemove);
+        pkeyFields.erase(idToRemove);
+    }
+
+    // Insert or update the new entries
+    names[tableID] = name;
+    dbFiles[tableID] = file;
+    pkeyFields[tableID] = pkeyField;
 }
 
 int Catalog::getTableId(const std::string &name) const {
