@@ -33,12 +33,14 @@ const TupleDesc &SeqScan::getTupleDesc() const {
 
 SeqScan::iterator SeqScan::begin() const {
     // TODO pa1.6: implement
-    return SeqScanIterator(TID, TABLE_ID, false);
+    HeapFile *currFile = static_cast<HeapFile*>(Database::getCatalog().getDatabaseFile(TABLE_ID));
+    return SeqScanIterator(TID, currFile->begin());
 }
 
 SeqScan::iterator SeqScan::end() const {
     // TODO pa1.6: implement
-    return SeqScanIterator(TID, TABLE_ID, true);
+    HeapFile *currFile = static_cast<HeapFile*>(Database::getCatalog().getDatabaseFile(TABLE_ID));
+    return SeqScanIterator(TID, currFile->end());
 }
 
 //
@@ -46,26 +48,15 @@ SeqScan::iterator SeqScan::end() const {
 //
 
 // TODO pa1.6: implement
-// isEnd indicates if the iterator reaches to the end.
-SeqScanIterator::SeqScanIterator(TransactionId *tid, int tableid, bool isEnd) {
-    this->TID = tid;
-    this->TABLE_ID = tableid;
-    this->IS_End = isEnd;
-    if (!isEnd) {
-        HeapFile *currFile = static_cast<HeapFile*>(Database::getCatalog().getDatabaseFile(tableid));
-        currFileIterator = HeapFileIterator(tid, 0, currFile);
-    }   
+SeqScanIterator::SeqScanIterator(TransactionId *tid, HeapFileIterator currFileIterator):TID(tid), currFileIterator(currFileIterator) {
+    // this->TID = tid;
+    // HeapFile *currFile = static_cast<HeapFile*>(Database::getCatalog().getDatabaseFile(tableid));
+    // currFileIterator = HeapFileIterator(tid, 0, currFile);
 }
 
 bool SeqScanIterator::operator!=(const SeqScanIterator &other) const {
     // TODO pa1.6: implement
-    if (IS_End && other.IS_End) {
-        return false;
-    }
-    if (IS_End || other.IS_End) {
-        return true;
-    }
-    return TID != other.TID || TABLE_ID != other.TABLE_ID || currFileIterator != other.currFileIterator;
+    return TID != other.TID || currFileIterator != other.currFileIterator;
 }
 
 SeqScanIterator &SeqScanIterator::operator++() {

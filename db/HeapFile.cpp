@@ -48,6 +48,7 @@ Page *HeapFile::readPage(const PageId &pid) {
 int HeapFile::getNumPages() const {
     // TODO pa1.5: implement
     BufferPool &bp = Database::getBufferPool();
+    // std::cout << "Filename: " << filename << std::endl;
     std::ifstream file(filename, std::ios::ate | std::ios::binary);  // open the file at the end
     long fileSize = file.tellg(); 
     file.close();
@@ -56,14 +57,12 @@ int HeapFile::getNumPages() const {
 
 HeapFileIterator HeapFile::begin() const {
     // TODO pa1.5: implement
-    TransactionId *t;
-    return HeapFileIterator(t, 0, this);
+    return HeapFileIterator(TID, 0, this);
 }
 
 HeapFileIterator HeapFile::end() const {
     // TODO pa1.5: implement
-    TransactionId *t;
-    return HeapFileIterator(t, getNumPages(), this);
+    return HeapFileIterator(TID, getNumPages(), this);
 }
 
 //

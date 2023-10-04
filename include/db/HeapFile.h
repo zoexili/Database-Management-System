@@ -44,8 +44,9 @@ namespace db {
      */
     class HeapFile : public DbFile {
         // TODO pa1.5: add private members
-        const char* filename;
+        std::string filename;
         TupleDesc TD; 
+        TransactionId *TID;
         
     public:
 

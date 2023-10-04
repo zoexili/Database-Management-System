@@ -17,9 +17,8 @@ namespace db {
         TransactionId* TID;
         int TABLE_ID;
         HeapFileIterator currFileIterator;
-        bool IS_End;
     public:
-        SeqScanIterator(TransactionId *tid, int tableid, bool isEnd);
+        SeqScanIterator(TransactionId *tid, HeapFileIterator currFileIterator);
 
         bool operator!=(const SeqScanIterator &other) const;
 
