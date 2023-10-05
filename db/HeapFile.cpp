@@ -72,12 +72,6 @@ HeapFileIterator HeapFile::end() const {
 HeapFileIterator::HeapFileIterator() {
     pagePosition = 0;
     file = nullptr;
-
-    if (pagePosition < file->getNumPages()) {
-        HeapPageId pageId(file->getId(), pagePosition); 
-        HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
-        currPageIterator = currPage->begin();
-    }
 }
 
 // TODO pa1.5: implement
@@ -94,7 +88,7 @@ HeapFileIterator::HeapFileIterator(TransactionId *tid, int pagePos, const HeapFi
     }
 }
 
-// 比较两个迭代器对象是否不同
+// compare two iterators
 bool HeapFileIterator::operator!=(const HeapFileIterator &other) const {
     // TODO pa1.5: implement
     return pagePosition != other.pagePosition || file != other.file;
@@ -106,20 +100,29 @@ Tuple &HeapFileIterator::operator*() const {
     return *currPageIterator;
 }
 
-// 使迭代器前进到下一个元组
+// iterator go forward
 HeapFileIterator &HeapFileIterator::operator++() {
     // TODO pa1.5: implement
     HeapPageId pageId(file->getId(), pagePosition); 
     HeapPage* currPage = static_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
-    if(currPageIterator != currPage->end()) {
+    
+    if (currPageIterator != currPage->end()) {
         ++currPageIterator;
-    } else {
+    } 
+    
+    // when we hit the end of page, go to next page. 
+    // I added a == operator to make sure page always switches when hits the end.
+    while (currPageIterator == currPage->end()) {
         ++pagePosition;
-        if (pagePosition < file->getNumPages()) {
-            HeapPageId pageId(file->getId(), pagePosition); 
-            HeapPage *currPage = dynamic_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
-            currPageIterator = currPage->begin();
+        if (pagePosition >= file->getNumPages()) {
+            // if no more pages, return
+            return *this;
         }
+        
+        pageId = HeapPageId(file->getId(), pagePosition); 
+        currPage = dynamic_cast<HeapPage*>(Database::getBufferPool().getPage(*TID, &pageId));
+        currPageIterator = currPage->begin();
     }
+    
     return *this;
 }

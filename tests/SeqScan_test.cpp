@@ -9,9 +9,9 @@
 #include "db/SeqScan.h"
 
 TEST(SeqScanTest, IterateFile) {
-    std::vector<db::Types::Type> types = {db::Types::INT_TYPE, db::Types::INT_TYPE, db::Types::INT_TYPE};
+    std::vector<db::Types::Type> types = {db::Types::INT_TYPE, db::Types::INT_TYPE};
 
-    std::vector<std::string> names = {"field0", "field1", "field2"};
+    std::vector<std::string> names = {"field0", "field1"};
 
     db::TupleDesc descriptor(types, names);
 

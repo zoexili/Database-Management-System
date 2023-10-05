@@ -19,6 +19,11 @@ bool HeapPageIterator::operator!=(const HeapPageIterator &other) const {
     return slot != other.slot || page != other.page;
 }
 
+bool HeapPageIterator::operator==(const HeapPageIterator &other) const {
+    return slot == other.slot || page == other.page;
+}
+
+
 HeapPageIterator &HeapPageIterator::operator++() {
     do {
         slot++;

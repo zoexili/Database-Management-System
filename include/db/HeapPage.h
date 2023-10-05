@@ -127,6 +127,7 @@ namespace db {
         HeapPageIterator(int slot, const HeapPage *page);
 
         bool operator!=(const HeapPageIterator &other) const;
+        bool operator==(const HeapPageIterator &other) const;
 
         Tuple &operator*() const;
 
